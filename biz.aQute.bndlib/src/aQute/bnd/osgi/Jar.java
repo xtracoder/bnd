@@ -871,6 +871,19 @@ public class Jar implements Closeable {
 		return s.trim();
 	}
 
+	public String getImplementationVersion() throws Exception {
+		check();
+		Manifest m = getManifest();
+		if (m == null)
+			return null;
+
+		String s = m.getMainAttributes().getValue(Constants.IMPLEMENTATION_VERSION);
+		if (s == null)
+			return null;
+
+		return s.trim();
+	}
+
 	/**
 	 * Expand the JAR file to a directory.
 	 * 
