@@ -435,6 +435,36 @@ public class Analyzer extends Processor {
 		// of available packages is remembered
 		//
 		map.put(packageRef).put(INTERNAL_SOURCE_DIRECTIVE, getName(jar));
+        
+        // Remember implementation version for exporting of embedded JARs, which are not 
+        // already packaged as bundles
+        String implVersion = null;
+        
+        if (implVersion == null) {
+            Parameters implVersionParam = getParameters(JAR_META);
+            String jarName = jar.getName();
+            Attrs jarImplVersion = implVersionParam.get(jarName);
+            
+            if (jarImplVersion == null) {
+                int pos = jarName.lastIndexOf('-');
+                if( pos > 0 ) {
+                    jarName = jarName.substring(0, pos);
+                    jarImplVersion = implVersionParam.get(jarName);
+                }
+            }
+                
+            if (jarImplVersion != null) {
+                implVersion = jarImplVersion.get(VERSION_ATTRIBUTE);
+            }
+        }
+        
+        if (implVersion != null) {
+            implVersion = jar.getImplementationVersion();
+        }
+
+        if (implVersion != null) {
+            map.put(packageRef).put(INTERNAL_IMPLEMENTATION_VERSION, implVersion);
+        }
 
 		// trace("%s from %s has no package info (either manifest, packageinfo
 		// or package-info.class",

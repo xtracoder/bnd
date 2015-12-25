@@ -409,6 +409,7 @@ public class Builder extends Analyzer {
 			}
 			if (v != null)
 				attributes.put(Constants.VERSION_ATTRIBUTE, cleanupVersion(v));
+            attributes.remove(Constants.INTERNAL_IMPLEMENTATION_VERSION);
 		}
 	}
 

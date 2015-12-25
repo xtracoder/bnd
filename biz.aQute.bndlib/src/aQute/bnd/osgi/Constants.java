@@ -340,7 +340,11 @@ public interface Constants {
 	char							DUPLICATE_MARKER							= '~';
 	String							INTERNAL_EXPORTED_DIRECTIVE					= "-internal-exported:";
 	String							INTERNAL_SOURCE_DIRECTIVE					= "-internal-source:";
+	String							INTERNAL_IMPLEMENTATION_VERSION 			= "-implementation-version";
+	String							JAR_META                                    = "-jar-meta";
+    
 	String							SPECIFICATION_VERSION						= "specification-version";
+	String							IMPLEMENTATION_VERSION						= "Implementation-Version";
 	String							SPLIT_PACKAGE_DIRECTIVE						= "-split-package:";
 	String							EFFECTIVE_DIRECTIVE							= "effective:";
 	String							IMPORT_DIRECTIVE							= "-import:";
