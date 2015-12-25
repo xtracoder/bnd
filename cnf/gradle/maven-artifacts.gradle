@@ -57,3 +57,69 @@ artifacts {
     builtBy pom
   }
 }
+
+apply plugin: 'maven-publish'
+
+ext {
+    // MAVEN publishing configuration - by default expected to run against
+    // local test instance of Nexus, take it from http://www.sonatype.org/nexus/go/.
+    // Either specify valid parameters in command line 
+    //      gradle publish '-PpublishUrl=http://...' '-PpublishUser=user' '-PpublishPwd=pwd'
+    // or define in local environment variables
+    //      SET BND_mvnPublishUrl=http://...
+    //      SET BND_mvnPublishUser=user
+    //      SET BND_mvnPublishPwd=pwd
+    sysPropPrefix = 'BND_'
+    mvnPublishUrl = (gradle.startParameter.projectProperties['mvnPublishUrl'] \
+                    ?: System.getenv("${sysPropPrefix}mvnPublishUrl")) \
+                    ?: 'http://localhost:8081/nexus/content/repositories/localTest/'
+    mvnPublishUser = (gradle.startParameter.projectProperties['mvnPublishUser'] \
+                    ?: System.getenv("${sysPropPrefix}mvnPublishUser")) \
+                    ?: 'localTest'
+    mvnPublishPwd = (gradle.startParameter.projectProperties['mvnPublishPwd'] \
+                    ?: System.getenv("${sysPropPrefix}mvnPublishPwd")) \
+                    ?: 'localTest'
+}
+
+publishing {
+    repositories {
+        maven {
+            // See initialization of values in 'props.gradle'
+            url project.ext.mvnPublishUrl
+            credentials {
+                username project.ext.mvnPublishUser
+                password project.ext.mvnPublishPwd
+            }
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            //artifactId = "${artifactFullId}"
+            from components.java
+
+            artifact sourcesJar {
+                classifier "sources"
+            }                
+        }
+    }
+}
+
+jar {
+    dependsOn 'generatePomFileForMavenJavaPublication'
+
+    into("META-INF/maven/$project.group/$archivesBaseName") {
+        from 'build/publications/mavenJava/pom-default.xml'
+        rename ".*", "pom.xml"
+    }    
+}
+
+task install {}
+
+tasks.publishToMavenLocal.dependsOn project.tasks.jar
+
+tasks.install.dependsOn publishToMavenLocal
+tasks.publish.dependsOn install
+tasks.build.finalizedBy project.tasks.install
